@@ -12,7 +12,7 @@
 
 [![npm](https://nodei.co/npm/postcss-font-pack.svg?downloads=true)](https://nodei.co/npm/postcss-font-pack/)
 
-[PostCSS](https://github.com/postcss/postcss) plugin to simplify font declarations by validating only configured font packs are used, adding fallbacks and translating human-readable weight names into CSS-valid values.
+[PostCSS](https://github.com/postcss/postcss) plugin to simplify font declarations by validating only configured font packs are used, adding fallbacks and transpiling human-readable font declaration values into valid CSS.
 
 ## Introduction
 
