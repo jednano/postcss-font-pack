@@ -30,7 +30,7 @@ These fonts can be defined in JSON format. You might call it `font-packs.json`:
 {
 	"times": {
 		"family": ["'Times New Roman'", "Times", "serif"],
-		"props": [
+		"propGroups": [
 			{},
 			{
 				"weight": ["bold", 700]
@@ -39,7 +39,7 @@ These fonts can be defined in JSON format. You might call it `font-packs.json`:
 	},
 	"roboto": {
 		"family": ["Roboto", "Arial", "sans-serif"],
-		"props": [
+		"propGroups": [
 			{
 				"style": "italic",
 				"weight": ["light", 300],
@@ -75,7 +75,7 @@ This would transpile into the following:
 }
 ```
 
-Notice the weight was changed from `bold` to `700` and from `light` to `300`. This came from the configuration's declaration value aliases, which were defined as `"weight": ["bold", 700]` and `"weight": ["light", 300]`, respectively. You can do this with any of the `props`, but since `style: italic`, `stretch: condensed` and `variant: small-caps` are already understood by the browser, it only made sense to use an alias for the weight in this case. You could have just as well congired the weight as `"weight": 300`, but that's not as human-readable as `light`, which the browser doesn't understand.
+Notice the weight was changed from `bold` to `700` and from `light` to `300`. This came from the configuration's declaration value aliases, which were defined as `"weight": ["bold", 700]` and `"weight": ["light", 300]`, respectively. You can do this with any of the prop groups, but since `style: italic`, `stretch: condensed` and `variant: small-caps` are already understood by the browser, it only made sense to use an alias for the weight in this case. You could have just as well congired the weight as `"weight": 300`, but that's not as human-readable as `light`, which the browser doesn't understand.
 
 Also, notice that fallback fonts were added to the `font-family`. This allows you to keep your syntax easy to read/write and let the plugin do the dirty work with configuration.
 
@@ -136,36 +136,41 @@ postcss([
 
 ## Options
 
-### `fonts`
+### `packs`
 
 Type: `Object`  
 Required: `true`
 
-An object literal containing all the font families you wish to support as keys. The values can have any of the following:
+An object literal where the keys are slugified fonts and the values are font packs. Each font pack consists of a required `family` and an optional collection of property groups, named as `propGroups`.
 
-#### `fallbacks`
+#### `pack.family`
 
 Type: `string[]`  
+Required: `true`
+
+If your font slug is `times`, this is where you would define the extended font name along with any fallbacks.
+
+_Note: If your font name requires quotes, you must add them yourself._
+
+#### `pack.propGroups`
+
+Type: `PropGroup[]`
 Required: `false`
 
-These will be concatenated with the parent key to form the `font-family` value.
+Define the property combinations that can be used together to reference a font.
 
-#### `packs`
+##### `pack.propGroups[n]`
 
-Type: `Object[]`  
-Required: `false`
+Type: `PropGroup`
 
-Each pack may contain the following as keys:
-- `weight` value maps to keys in the [`weightMap`](#weightMap)
+Each prop group may contain 0 or more of the following keys:
+- [`weight`](https://developer.mozilla.org/en-US/docs/Web/CSS/font-style)
 - [`style`](https://developer.mozilla.org/en-US/docs/Web/CSS/font-style)
 - [`variant`](https://developer.mozilla.org/en-US/docs/Web/CSS/font-variant)
 - [`stretch`](https://developer.mozilla.org/en-US/docs/Web/CSS/font-stretch)
 
-#### `weightMap`
+Each value can be a `string` or a `string[]` with two values. The first value is a slugified value that you can type in your CSS to reference the associated key. The second value is what the first value will be transpiled into, so make sure they are CSS-valid. The `weight` values can additionally be numbers.
 
-Type: `Object`  
-Required: `false`
+If an empty object is provided, this indicates that you want to support this font family with default browser values for weight, style, variant and stretch.
 
-The keys are aliases, so they can technically be anything you like; however, it's probably best to slugify the names given by the fonts themselves. One font might use "Extra Light" to map to `200`, but another font might use "Ultra Light" to map to the same `200` weight. Slugified, you would use `extra-light` and `ultra-light`, respectively.
-
-All keys will be translated into their respective values, so make sure the values are [valid values](https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight#Values). Using numeric font weights for values is recommended.
+_Note: If you don't include an empty object you will be unable to reference a family without also referencing additional properties._

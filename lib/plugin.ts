@@ -38,11 +38,11 @@ var PostCssFontPack: (options: PostCssFontPack.Options) => void = postcss.plugin
 				}
 				var family = {};
 				family[`family:${key}`] = pack.family.join(', ');
-				if (!pack.props || !pack.props.length) {
+				if (!pack.propGroups || !pack.propGroups.length) {
 					lookup[key] = [family];
 					return;
 				}
-				lookup[key] = pack.props.map(prop => {
+				lookup[key] = pack.propGroups.map(prop => {
 					var props = {};
 					Object.keys(prop).forEach(p => {
 						var v = prop[p];
@@ -194,12 +194,12 @@ module PostCssFontPack {
 	}
 	export interface Pack {
 		family: string[];
-		props?: Prop[];
+		propGroups?: PropGroup[];
 	}
 	/**
 	 * A collection of supported properties for the associated font family.
 	 */
-	export interface Prop {
+	export interface PropGroup {
 		weight?: string|number|(string|number)[];
 		style?: string|string[];
 		variant?: string|string[];

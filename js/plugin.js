@@ -32,11 +32,11 @@ var PostCssFontPack = postcss.plugin('postcss-font-pack', function (options) {
             }
             var family = {};
             family[("family:" + key)] = pack.family.join(', ');
-            if (!pack.props || !pack.props.length) {
+            if (!pack.propGroups || !pack.propGroups.length) {
                 lookup[key] = [family];
                 return;
             }
-            lookup[key] = pack.props.map(function (prop) {
+            lookup[key] = pack.propGroups.map(function (prop) {
                 var props = {};
                 Object.keys(prop).forEach(function (p) {
                     var v = prop[p];

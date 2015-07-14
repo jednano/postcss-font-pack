@@ -27,7 +27,7 @@ describe('postcss-font-pack plugin', function () {
     });
     it('throws if a pack family is not specified', function () {
         var fn = function () {
-            check({ packs: { a: { props: [] } } }, '');
+            check({ packs: { a: { propGroups: [] } } }, '');
         };
         expect(fn).to.throw("" + ERROR_PREFIX + " missing required pack.family");
     });
@@ -43,7 +43,7 @@ describe('postcss-font-pack plugin', function () {
                 packs: {
                     roboto: {
                         family: ['Roboto'],
-                        props: [
+                        propGroups: [
                             {
                                 weight: null
                             }
@@ -96,7 +96,7 @@ describe('postcss-font-pack plugin', function () {
                 packs: {
                     roboto: {
                         family: ['Roboto'],
-                        props: [
+                        propGroups: [
                             {
                                 weight: ['bold', 700]
                             },
@@ -136,7 +136,7 @@ describe('postcss-font-pack plugin', function () {
             packs: {
                 roboto: {
                     family: ['Roboto', 'Arial', 'sans-serif'],
-                    props: [
+                    propGroups: [
                         {
                             weight: 300
                         }
@@ -150,7 +150,7 @@ describe('postcss-font-pack plugin', function () {
             packs: {
                 roboto: {
                     family: ['Roboto', 'Arial', 'sans-serif'],
-                    props: [
+                    propGroups: [
                         {
                             weight: ['light', 300]
                         }
@@ -164,7 +164,7 @@ describe('postcss-font-pack plugin', function () {
             packs: {
                 roboto: {
                     family: ['Roboto', 'Arial', 'sans-serif'],
-                    props: [
+                    propGroups: [
                         {
                             style: 'italic'
                         }
@@ -178,7 +178,7 @@ describe('postcss-font-pack plugin', function () {
             packs: {
                 roboto: {
                     family: ['Roboto', 'Arial', 'sans-serif'],
-                    props: [
+                    propGroups: [
                         {
                             variant: 'small-caps'
                         }
@@ -192,7 +192,7 @@ describe('postcss-font-pack plugin', function () {
             packs: {
                 roboto: {
                     family: ['Roboto', 'Arial', 'sans-serif'],
-                    props: [
+                    propGroups: [
                         {
                             stretch: 'expanded'
                         }
@@ -206,7 +206,7 @@ describe('postcss-font-pack plugin', function () {
             packs: {
                 roboto: {
                     family: ['Roboto', 'Arial', 'sans-serif'],
-                    props: [
+                    propGroups: [
                         {
                             weight: ['light', 300],
                             style: 'italic',
@@ -223,7 +223,7 @@ describe('postcss-font-pack plugin', function () {
             packs: {
                 roboto: {
                     family: ['Roboto', 'Arial', 'sans-serif'],
-                    props: [
+                    propGroups: [
                         {},
                         {
                             style: 'italic'
@@ -239,7 +239,7 @@ describe('postcss-font-pack plugin', function () {
                 packs: {
                     roboto: {
                         family: ['Roboto', 'Arial', 'sans-serif'],
-                        props: [
+                        propGroups: [
                             {
                                 style: 'italic'
                             }
@@ -256,7 +256,7 @@ describe('postcss-font-pack plugin', function () {
                 packs: {
                     roboto: {
                         family: ['Roboto', 'Arial', 'sans-serif'],
-                        props: [
+                        propGroups: [
                             {
                                 style: 'italic',
                                 stretch: 'expanded'

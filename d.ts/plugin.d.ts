@@ -14,12 +14,12 @@ declare module PostCssFontPack {
     }
     interface Pack {
         family: string[];
-        props?: Prop[];
+        propGroups?: PropGroup[];
     }
     /**
      * A collection of supported properties for the associated font family.
      */
-    interface Prop {
+    interface PropGroup {
         weight?: string | number | (string | number)[];
         style?: string | string[];
         variant?: string | string[];
