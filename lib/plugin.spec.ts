@@ -46,6 +46,99 @@ describe('postcss-font-pack plugin', () => {
 		expect(fn).to.throw(`${ERROR_PREFIX} pack.family is empty`);
 	});
 
+	it('throws if prop value is null', () => {
+		var fn = () => {
+			check(
+				{
+					packs: {
+						roboto: {
+							family: ['Roboto'],
+							props: [
+								{
+									weight: null
+								}
+							]
+						}
+					}
+				},
+				''
+			);
+		};
+		expect(fn).to.throw(TypeError, `${ERROR_PREFIX} prop value expects string, number or array`);
+	});
+
+	it('throws if font declaration is missing a size', () => {
+		var fn = () => {
+			check(
+				{
+					packs: {
+						roboto: {
+							family: ['Roboto']
+						}
+					}
+				},
+				'body{font:roboto}'
+			);
+		};
+		expect(fn).to.throw(/font property requires size and family/);
+	});
+
+	it('throws if font declaration is missing a family', () => {
+		var fn = () => {
+			check(
+				{
+					packs: {
+						roboto: {
+							family: ['Roboto']
+						}
+					}
+				},
+				'body{font:0}'
+			);
+		};
+		expect(fn).to.throw(/font property requires size and family/);
+	});
+
+	it('throws if no pack is found for font-family property', () => {
+		var fn = () => {
+			check(
+				{
+					packs: {
+						roboto: {
+							family: ['Roboto']
+						}
+					}
+				},
+				'body{font-family:foo}'
+			);
+		};
+		expect(fn).to.throw(/pack not found/);
+	});
+
+	it('throws if more than one pack is found', () => {
+		var fn = () => {
+			check(
+				{
+					packs: {
+						roboto: {
+							family: ['Roboto'],
+							props: [
+								{
+									weight: ['bold', 700]
+								},
+								{
+									weight: ['bold', 600]
+								}
+							]
+						}
+					}
+				},
+				'body{font:bold 0 roboto}'
+			);
+		};
+		expect(fn).to.throw(`${ERROR_PREFIX} more than one pack found`);
+	});
+
 	it('resolves a font-family declaration', () => {
 		check(
 			{

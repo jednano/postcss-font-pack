@@ -79,7 +79,7 @@ Notice the weight was changed from `bold` to `700` and from `light` to `300`. Th
 
 Also, notice that fallback fonts were added to the `font-family`. This allows you to keep your syntax easy to read/write and let the plugin do the dirty work with configuration.
 
-You don't have to use the font shorthand property. You can also write-out each declaration individually or you can use the [`postcss-nested-props`](https://github.com/jedmao/postcss-nested-props) plugin to enable a nested syntax.
+You don't have to use the font shorthand property. You can also write-out each declaration individually or you can use the [`postcss-nested-props`](https://github.com/jedmao/postcss-nested-props) plugin to enable a nested syntax. Just make sure you unwrap the nested with that plugin before you run this one.
 
 ## Validation
 

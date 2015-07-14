@@ -70,13 +70,16 @@ var PostCssFontPack: (options: PostCssFontPack.Options) => void = postcss.plugin
 
 				function resolveDeclaration(decl: any) {
 					function validatePackFound() {
-						if (!filteredPacks.length) {
+						if (!filteredPacks || !filteredPacks.length) {
 							throw decl.error('pack not found', ERROR_CONTEXT);
 						}
 					}
 
 					if (decl.prop === 'font') {
 						var parts = decl.value.match(FONT_VALUE_PATTERN);
+						if (!parts) {
+							throw decl.error('font property requires size and family');
+						}
 						props.font = _.omit(
 							{
 								props: parts[1],
@@ -116,10 +119,6 @@ var PostCssFontPack: (options: PostCssFontPack.Options) => void = postcss.plugin
 				}
 
 				rule.eachDecl(/^font(-family)?$/, resolveDeclaration);
-				if (_.isUndefined(filteredPacks)) {
-					throw new Error(`${ERROR_PREFIX} family not specified`);
-				}
-
 				rule.eachDecl(/^font-(weight|style|variant|stretch)$/, resolveDeclaration);
 
 				filteredPacks = _.reject(filteredPacks, p2 => {
@@ -139,6 +138,7 @@ var PostCssFontPack: (options: PostCssFontPack.Options) => void = postcss.plugin
 							isMatch = false;
 							return false;
 						}
+						return true;
 					});
 					return !isMatch;
 				});
