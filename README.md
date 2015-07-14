@@ -21,8 +21,8 @@ Dealing with fonts can be a pain, especially on teams where not everybody knows 
 ## Configuration
 
 Let's start with the following assumptions:
-1. We're using "Times New Roman" because it's a commonly used [web safe font](http://www.w3schools.com/cssref/css_websafe_fonts.asp). It also illustrates how to use fonts that need quotes in this plugin.
-1. We've installed [Roboto](http://www.fontsquirrel.com/fonts/roboto?q%5Bterm%5D=roboto&q%5Bsearch_check%5D=Y) and already setup its [@font-face](https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face).
+- We're using "Times New Roman" because it's a commonly used [web safe font](http://www.w3schools.com/cssref/css_websafe_fonts.asp). It also illustrates how to use fonts that need quotes in this plugin.
+- We've installed [Roboto](http://www.fontsquirrel.com/fonts/roboto?q%5Bterm%5D=roboto&q%5Bsearch_check%5D=Y) and already setup its [@font-face](https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face).
 
 These fonts can be defined in JSON format. You might call it `font-packs.json`:
 
