@@ -55,7 +55,7 @@ With the above configuration, we can write our CSS using the [font shorthand pro
 
 ```css
 .foo {
-	font: bold 1rem/1.2 'Times New Roman', Times, serif;
+	font: bold 1rem/1.2 times;
 }
 
 .bar {
