@@ -83,37 +83,23 @@ You don't have to use the font shorthand property. You can also write-out each d
 
 ## Validation
 
-This plugin also handles validation so you can sleep sound knowing that nobody is using fonts or combinations of font declarations that are not supported or go against the design of the site. Here's what happens if someone tries to use an unsupported font family:
+This plugin also handles validation so you can sleep sound knowing that nobody is using fonts or combinations of font declarations that are not supported or otherwise go against the design of the site. The following rules would all throw the same error, "pack not found":
 
 ```css
 .foo {
 	font-family: "Futura PT";
 }
-```
 
-> [postcss-font-pack] no pack found for family: "Futura PT"
-
-What happens if you try to use a supported font family and add your own fallbacks?
-
-```css
-.foo {
+.bar {
 	font-family: roboto, sans-serif;
 }
-```
 
-> [postcss-font-pack] fallbacks may only be defined in plugin options
-
-How about a supported font family with an unsupported pack?
-
-```css
-.foo {
+.baz {
 	font: light 1rem/1.2 roboto;
 }
 ```
 
-> [postcss-font-pack] no pack found for family: roboto, weight: light
-
-Even though the `light` weight is found in your configuration, there is no font pack that uses `light` without also using `italic` and `condensed`. In this case, you have to use all three of them together to form a pack and to pass validation.
+Even though the `light` weight is found in your configuration, there is no font pack that uses `light` without also using `italic` and `condensed`. You have to use all three of them together to form a pack and to pass validation.
 
 As you can see, this plugin will stop unsupported font declarations dead in their tracks.
 

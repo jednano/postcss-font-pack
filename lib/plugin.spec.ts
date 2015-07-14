@@ -139,6 +139,22 @@ describe('postcss-font-pack plugin', () => {
 		expect(fn).to.throw(`${ERROR_PREFIX} more than one pack found`);
 	});
 
+	it('throws if fallbacks are provided', () => {
+		var fn = () => {
+			check(
+				{
+					packs: {
+						roboto: {
+							family: ['Roboto', 'Arial', 'sans-serif']
+						}
+					}
+				},
+				'body{font:0 roboto, Arial, sans-serif}'
+			);
+		};
+		expect(fn).to.throw(/pack not found/);
+	});
+
 	it('resolves a font-family declaration', () => {
 		check(
 			{
