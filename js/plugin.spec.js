@@ -268,6 +268,15 @@ describe('postcss-font-pack plugin', function () {
         };
         expect(fn).to.throw("" + ERROR_PREFIX + " pack not found");
     });
+    it('remains silent for rules without font declarations', function () {
+        check({
+            packs: {
+                roboto: {
+                    family: ['Roboto', 'Arial', 'sans-serif']
+                }
+            }
+        }, 'body{color:red}', 'body{color:red}');
+    });
 });
 function check(options, input, output) {
     var processor = postcss([plugin(options)]);

@@ -67,8 +67,11 @@ var PostCssFontPack: (options: PostCssFontPack.Options) => void = postcss.plugin
 			node.eachRule(rule => {
 				var filteredPacks: any[];
 				var props: any = {};
+				var isFontDeclarationFound = false;
 
 				function resolveDeclaration(decl: any) {
+					isFontDeclarationFound = true;
+
 					function validatePackFound() {
 						if (!filteredPacks || !filteredPacks.length) {
 							throw decl.error('pack not found', ERROR_CONTEXT);
@@ -120,6 +123,9 @@ var PostCssFontPack: (options: PostCssFontPack.Options) => void = postcss.plugin
 
 				rule.eachDecl(/^font(-family)?$/, resolveDeclaration);
 				rule.eachDecl(/^font-(weight|style|variant|stretch)$/, resolveDeclaration);
+				if (!isFontDeclarationFound) {
+					return;
+				}
 
 				filteredPacks = _.reject(filteredPacks, p2 => {
 					var isMatch = true;
