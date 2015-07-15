@@ -116,7 +116,7 @@ $ npm install postcss-font-pack
 ```js
 postcss([
 	require('postcss-font-pack')({
-		fonts: require('./font-packs.json')
+		packs: require('./font-packs.json')
 	})
 ]);
 ```
@@ -129,7 +129,7 @@ import postcssFontPack = require('postcss-font-pack');
 
 postcss([
 	postcssFontPack({
-		fonts: require('./font-packs.json')
+		packs: require('./font-packs.json')
 	})
 ]);
 ```
