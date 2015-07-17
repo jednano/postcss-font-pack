@@ -60,9 +60,9 @@ var PostCssFontPack = postcss.plugin('postcss-font-pack', function (options) {
         node.eachRule(function (rule) {
             var filteredPacks;
             var props = {};
-            var isFontDeclarationFound = false;
+            var fontDeclarationCount = 0;
+            var isSizeProvided = false;
             function resolveDeclaration(decl) {
-                isFontDeclarationFound = true;
                 function validatePackFound() {
                     if (!filteredPacks || !filteredPacks.length) {
                         throw decl.error('pack not found', ERROR_CONTEXT);
@@ -73,6 +73,8 @@ var PostCssFontPack = postcss.plugin('postcss-font-pack', function (options) {
                     if (!parts) {
                         throw decl.error('font property requires size and family');
                     }
+                    fontDeclarationCount += parts.length - 1;
+                    isSizeProvided = true;
                     props.font = _.omit({
                         props: parts[1],
                         sizeLineHeight: parts[2],
@@ -95,6 +97,7 @@ var PostCssFontPack = postcss.plugin('postcss-font-pack', function (options) {
                     validatePackFound();
                 }
                 else {
+                    fontDeclarationCount++;
                     var prop = decl.prop.substr(5);
                     if (prop === 'family') {
                         filteredPacks = lookup[decl.value];
@@ -110,8 +113,17 @@ var PostCssFontPack = postcss.plugin('postcss-font-pack', function (options) {
             }
             rule.eachDecl(/^font(-family)?$/, resolveDeclaration);
             rule.eachDecl(/^font-(weight|style|variant|stretch)$/, resolveDeclaration);
-            if (!isFontDeclarationFound) {
+            rule.eachDecl('font-size', function () {
+                isSizeProvided = true;
+                if (++fontDeclarationCount === 1) {
+                    throw new Error("" + ERROR_PREFIX + " font-size missing required family");
+                }
+            });
+            if (fontDeclarationCount === 0) {
                 return;
+            }
+            if (options.requireSize && !isSizeProvided) {
+                throw new Error("" + ERROR_PREFIX + " missing required font-size");
             }
             filteredPacks = _.reject(filteredPacks, function (p2) {
                 var isMatch = true;

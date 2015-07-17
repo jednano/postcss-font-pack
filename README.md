@@ -136,6 +136,30 @@ postcss([
 
 ## Options
 
+### `requireSize`
+
+Type: `boolean`  
+Required: `false`  
+Default: `false`
+
+When `true`, an error will be thrown if you have a rule with one or more font declarations, but without a font size.
+
+```css
+.foo {
+	font-family: roboto;
+	/* missing required font-size */
+}
+```
+
+Regardless of this option, if you have a rule with only a `font-size` specified you will get an error:
+
+```css
+.foo {
+	font-size: 1rem;
+	/* font-size missing required family */
+}
+```
+
 ### `packs`
 
 Type: `Object`  

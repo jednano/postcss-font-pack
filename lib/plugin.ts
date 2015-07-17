@@ -67,10 +67,10 @@ var PostCssFontPack: (options: PostCssFontPack.Options) => void = postcss.plugin
 			node.eachRule(rule => {
 				var filteredPacks: any[];
 				var props: any = {};
-				var isFontDeclarationFound = false;
+				var fontDeclarationCount = 0;
+				var isSizeProvided = false;
 
 				function resolveDeclaration(decl: any) {
-					isFontDeclarationFound = true;
 
 					function validatePackFound() {
 						if (!filteredPacks || !filteredPacks.length) {
@@ -83,6 +83,8 @@ var PostCssFontPack: (options: PostCssFontPack.Options) => void = postcss.plugin
 						if (!parts) {
 							throw decl.error('font property requires size and family');
 						}
+						fontDeclarationCount += parts.length - 1;
+						isSizeProvided = true;
 						props.font = _.omit(
 							{
 								props: parts[1],
@@ -108,6 +110,7 @@ var PostCssFontPack: (options: PostCssFontPack.Options) => void = postcss.plugin
 						}
 						validatePackFound();
 					} else {
+						fontDeclarationCount++;
 						var prop = decl.prop.substr(5);
 						if (prop === 'family') {
 							filteredPacks = lookup[decl.value];
@@ -123,8 +126,19 @@ var PostCssFontPack: (options: PostCssFontPack.Options) => void = postcss.plugin
 
 				rule.eachDecl(/^font(-family)?$/, resolveDeclaration);
 				rule.eachDecl(/^font-(weight|style|variant|stretch)$/, resolveDeclaration);
-				if (!isFontDeclarationFound) {
+				rule.eachDecl('font-size', () => {
+					isSizeProvided = true;
+					if (++fontDeclarationCount === 1) {
+						throw new Error(`${ERROR_PREFIX} font-size missing required family`);
+					}
+				});
+
+				if (fontDeclarationCount === 0) {
 					return;
+				}
+
+				if (options.requireSize && !isSizeProvided) {
+					throw new Error(`${ERROR_PREFIX} missing required font-size`);
 				}
 
 				filteredPacks = _.reject(filteredPacks, p2 => {
@@ -193,6 +207,11 @@ module PostCssFontPack {
 	 * Plugin options.
 	 */
 	export interface Options {
+		/**
+		 * When true, an error will be thrown if you have a rule with one or more
+		 * font declarations, but without a font size.
+		 */
+		requireSize?: boolean;
 		/**
 		 * Supported font packs.
 		 */

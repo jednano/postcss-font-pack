@@ -6,6 +6,11 @@ declare module PostCssFontPack {
      */
     interface Options {
         /**
+         * When true, an error will be thrown if you have a rule with one or more
+         * font declarations, but without a font size.
+         */
+        requireSize?: boolean;
+        /**
          * Supported font packs.
          */
         packs: {

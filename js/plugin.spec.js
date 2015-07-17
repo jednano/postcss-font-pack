@@ -268,6 +268,18 @@ describe('postcss-font-pack plugin', function () {
         };
         expect(fn).to.throw("" + ERROR_PREFIX + " pack not found");
     });
+    it('throws if only a font-size is provided', function () {
+        var fn = function () {
+            check({
+                packs: {
+                    roboto: {
+                        family: ['Roboto', 'Arial', 'sans-serif']
+                    }
+                }
+            }, 'body{font-size:0}');
+        };
+        expect(fn).to.throw("" + ERROR_PREFIX + " font-size missing required family");
+    });
     it('remains silent for rules without font declarations', function () {
         check({
             packs: {
@@ -276,6 +288,35 @@ describe('postcss-font-pack plugin', function () {
                 }
             }
         }, 'body{color:red}', 'body{color:red}');
+    });
+    describe('plugin options', function () {
+        describe('requireSize: true', function () {
+            it('throws if no font-size is specified', function () {
+                var fn = function () {
+                    check({
+                        requireSize: true,
+                        packs: {
+                            roboto: {
+                                family: ['Roboto', 'Arial', 'sans-serif']
+                            }
+                        }
+                    }, 'body{font-family:roboto}');
+                };
+                expect(fn).to.throw("" + ERROR_PREFIX + " missing required font-size");
+            });
+            it('remains silent when both size and family are provided', function () {
+                var options = {
+                    requireSize: true,
+                    packs: {
+                        roboto: {
+                            family: ['Roboto', 'Arial', 'sans-serif']
+                        }
+                    }
+                };
+                check(options, 'body{font-family:roboto;font-size:0}', 'body{font-family:Roboto, Arial, sans-serif;font-size:0}');
+                check(options, 'body{font:1rem roboto}', 'body{font:1rem Roboto, Arial, sans-serif}');
+            });
+        });
     });
 });
 function check(options, input, output) {
