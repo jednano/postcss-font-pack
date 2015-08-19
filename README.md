@@ -6,8 +6,6 @@
 
 [![Build Status](https://travis-ci.org/jedmao/postcss-font-pack.svg?branch=master)](https://travis-ci.org/jedmao/postcss-font-pack)
 [![npm version](https://badge.fury.io/js/postcss-font-pack.svg)](http://badge.fury.io/js/postcss-font-pack)
-[![Code Climate](https://codeclimate.com/github/jedmao/postcss-font-pack/badges/gpa.svg)](https://codeclimate.com/github/jedmao/postcss-font-pack)
-[![Test Coverage](https://codeclimate.com/github/jedmao/postcss-font-pack/badges/coverage.svg)](https://codeclimate.com/github/jedmao/postcss-font-pack)
 [![npm license](http://img.shields.io/npm/l/postcss-font-pack.svg?style=flat-square)](https://www.npmjs.org/package/postcss-font-pack)
 
 [![npm](https://nodei.co/npm/postcss-font-pack.svg?downloads=true)](https://nodei.co/npm/postcss-font-pack/)
@@ -125,7 +123,7 @@ postcss([
 
 ```ts
 ///<reference path="node_modules/postcss-font-pack/.d.ts" />
-import postcssFontPack = require('postcss-font-pack');
+import postcssFontPack from 'postcss-font-pack';
 
 postcss([
 	postcssFontPack({
@@ -138,8 +136,8 @@ postcss([
 
 ### `requireSize`
 
-Type: `boolean`  
-Required: `false`  
+Type: `boolean`
+Required: `false`
 Default: `false`
 
 When `true`, an error will be thrown if you have a rule with one or more font declarations, but without a font size.
@@ -162,14 +160,14 @@ Regardless of this option, if you have a rule with only a `font-size` specified 
 
 ### `packs`
 
-Type: `Object`  
+Type: `Object`
 Required: `true`
 
 An object literal where the keys are slugified fonts and the values are font packs. Each font pack consists of a required `family` and an optional collection of property groups, named as `propGroups`.
 
 #### `pack.family`
 
-Type: `string[]`  
+Type: `string[]`
 Required: `true`
 
 If your font slug is `times`, this is where you would define the extended font name along with any fallbacks.
@@ -198,3 +196,23 @@ Each value can be a `string` or a `string[]` with two values. The first value is
 If an empty object is provided, this indicates that you want to support this font family with default browser values for weight, style, variant and stretch.
 
 _Note: If you don't include an empty object you will be unable to reference a family without also referencing additional properties._
+
+## Testing
+
+Run the following command:
+
+```
+$ npm test
+```
+
+This will build scripts, run tests and generate a code coverage report. Anything less than 100% coverage will throw an error.
+
+### Watching
+
+For much faster development cycles, run the following command:
+
+```
+$ npm run watch
+```
+
+This will build scripts, run tests and watch for changes.

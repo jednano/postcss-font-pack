@@ -1,208 +1,207 @@
-﻿///<reference path="../typings/node/node.d.ts" />
-var postcss = require('postcss');
-var _ = require('lodash');
+﻿///<reference path="../typings/postcss/.d.ts" />
+import postcss from 'postcss';
+const _ = require('lodash');
 
-var PLUGIN_NAME = 'postcss-font-pack';
-var ERROR_CONTEXT = { plugin: PLUGIN_NAME };
-var ERROR_PREFIX = `[${PLUGIN_NAME}]`;
+const plugin = 'postcss-font-pack';
+const errorContext = { plugin };
+const errorPrefix = `[${plugin}]`;
 
-var FONT_VALUE_PATTERN = /^(?:\s*(.+)\s+)?(\S+(?:\/\S+)?)\s+(.+)\s*$/;
+const fontValuePattern = /^(?:\s*(.+)\s+)?(\S+(?:\/\S+)?)\s+(.+)\s*$/;
 
-// ReSharper disable once UnusedLocals
-// ReSharper disable RedundantQualifier
-var PostCssFontPack: (options: PostCssFontPack.Options) => void = postcss.plugin(
-	'postcss-font-pack',
-	(options: PostCssFontPack.Options) => {
-		// ReSharper enable RedundantQualifier
-		return node => {
-			if (!options) {
-				throw new Error(`${ERROR_PREFIX} missing required configuration`);
+export default postcss.plugin<PostCssFontPack.Options>('postcss-font-pack', options => {
+
+	return node => {
+
+		if (!options) {
+			throw new Error(`${errorPrefix} missing required configuration`);
+		}
+
+		const packs = options.packs;
+		if (!packs) {
+			throw new Error(`${errorPrefix} missing required option: packs`);
+		}
+
+		const keys = Object.keys(packs);
+		if (!keys.length) {
+			throw new Error(`${errorPrefix} packs option has no keys`);
+		}
+
+		const lookup = {};
+		keys.forEach(key => {
+			const pack = packs[key];
+			if (!pack.family) {
+				throw new Error(`${errorPrefix} missing required pack.family`);
 			}
-			var packs = options.packs;
-			if (!packs) {
-				throw new Error(`${ERROR_PREFIX} missing required option: packs`);
+			if (!pack.family.length) {
+				throw new Error(`${errorPrefix} pack.family is empty`);
 			}
-			var keys = Object.keys(packs);
-			if (!keys.length) {
-				throw new Error(`${ERROR_PREFIX} packs option has no keys`);
+			const family = {};
+			family[`family:${key}`] = pack.family.join(', ');
+			if (!pack.propGroups || !pack.propGroups.length) {
+				lookup[key] = [family];
+				return;
 			}
-
-			var lookup = {};
-			keys.forEach(key => {
-				var pack = packs[key];
-				if (!pack.family) {
-					throw new Error(`${ERROR_PREFIX} missing required pack.family`);
-				}
-				if (!pack.family.length) {
-					throw new Error(`${ERROR_PREFIX} pack.family is empty`);
-				}
-				var family = {};
-				family[`family:${key}`] = pack.family.join(', ');
-				if (!pack.propGroups || !pack.propGroups.length) {
-					lookup[key] = [family];
-					return;
-				}
-				lookup[key] = pack.propGroups.map(prop => {
-					var props = {};
-					Object.keys(prop).forEach(p => {
-						var v = prop[p];
-						switch (typeof v) {
-							case 'string':
-							case 'number':
-								props[`${p}:${v}`] = v;
-								props[`reverse:${v}`] = p;
-								break;
-							default:
-								if (!Array.isArray(v)) {
-									throw new TypeError(`${ERROR_PREFIX} prop value expects string, number or array`);
-								}
-								props[`${p}:${v[0]}`] = v[1];
-								props[`reverse:${v[0]}`] = p;
-						}
-					});
-					return _.assign({}, family, props);
-				});
-			});
-
-			node.eachRule(rule => {
-				var filteredPacks: any[];
-				var props: any = {};
-				var fontDeclarationCount = 0;
-				var isSizeProvided = false;
-
-				function resolveDeclaration(decl: any) {
-
-					function validatePackFound() {
-						if (!filteredPacks || !filteredPacks.length) {
-							throw decl.error('pack not found', ERROR_CONTEXT);
-						}
+			lookup[key] = pack.propGroups.map(prop => {
+				const props = {};
+				Object.keys(prop).forEach(p => {
+					const v = prop[p];
+					switch (typeof v) {
+						case 'string':
+						case 'number':
+							props[`${p}:${v}`] = v;
+							props[`reverse:${v}`] = p;
+							break;
+						default:
+							if (!Array.isArray(v)) {
+								throw new TypeError(`${errorPrefix} prop value expects string, number or array`);
+							}
+							props[`${p}:${v[0]}`] = v[1];
+							props[`reverse:${v[0]}`] = p;
 					}
+				});
+				return <any>_.assign({}, family, props);
+			});
+		});
 
-					if (decl.prop === 'font') {
-						var parts = decl.value.match(FONT_VALUE_PATTERN);
-						if (!parts) {
-							throw decl.error('font property requires size and family');
-						}
-						fontDeclarationCount += parts.length - 1;
-						isSizeProvided = true;
-						props.font = _.omit(
-							{
-								props: parts[1],
-								sizeLineHeight: parts[2],
-								family: parts[3]
-							},
-							_.isUndefined
+		node.eachRule(rule => {
+			const props: any = {};
+			let filteredPacks = [];
+			let fontDeclarationCount = 0;
+			let isSizeProvided = false;
+
+			function resolveDeclaration(decl: any) {
+
+				function validatePackFound() {
+					if (!filteredPacks || !filteredPacks.length) {
+						throw decl.error('pack not found', errorContext);
+					}
+				}
+
+				if (decl.prop === 'font') {
+					const parts = decl.value.match(fontValuePattern);
+					if (!parts) {
+						throw decl.error(
+							'font property requires size and family',
+							errorContext
 						);
-						filteredPacks = lookup[props.font.family];
-
-						if (props.font.props) {
-							props.font.props.split(/\s+/).forEach(val => {
-								filteredPacks = _.filter(filteredPacks, o => {
-									var prop = o[`reverse:${val}`];
-									if (_.isUndefined(prop)) {
-										return false;
-									}
-									props.font[prop] = val;
-									return true;
-								});
-							});
-							delete props.font.props;
-						}
-						validatePackFound();
-					} else {
-						fontDeclarationCount++;
-						var prop = decl.prop.substr(5);
-						if (prop === 'family') {
-							filteredPacks = lookup[decl.value];
-						} else {
-							filteredPacks = _.filter(filteredPacks, o => {
-								return o.hasOwnProperty(`${prop}:${decl.value}`);
-							});
-						}
-						validatePackFound();
-						props[prop] = decl.value;
 					}
-				}
-
-				rule.eachDecl(/^font(-family)?$/, resolveDeclaration);
-				rule.eachDecl(/^font-(weight|style|variant|stretch)$/, resolveDeclaration);
-				rule.eachDecl('font-size', () => {
+					fontDeclarationCount += parts.length - 1;
 					isSizeProvided = true;
-					if (++fontDeclarationCount === 1) {
-						throw new Error(`${ERROR_PREFIX} font-size missing required family`);
+					props.font = _.omit(
+						{
+							props: parts[1],
+							sizeLineHeight: parts[2],
+							family: parts[3]
+						},
+						_.isUndefined
+					);
+					filteredPacks = lookup[props.font.family];
+
+					if (props.font.props) {
+						props.font.props.split(/\s+/).forEach(val => {
+							filteredPacks = _.filter(filteredPacks, o => {
+								const prop = o[`reverse:${val}`];
+								if (_.isUndefined(prop)) {
+									return false;
+								}
+								props.font[prop] = val;
+								return true;
+							});
+						});
+						delete props.font.props;
 					}
-				});
-
-				if (fontDeclarationCount === 0) {
-					return;
+					validatePackFound();
+				} else {
+					fontDeclarationCount++;
+					const prop = decl.prop.substr(5);
+					if (prop === 'family') {
+						filteredPacks = lookup[decl.value];
+					} else {
+						filteredPacks = _.filter(filteredPacks, o => {
+							return o.hasOwnProperty(`${prop}:${decl.value}`);
+						});
+					}
+					validatePackFound();
+					props[prop] = decl.value;
 				}
+			}
 
-				if (options.requireSize && !isSizeProvided) {
-					throw new Error(`${ERROR_PREFIX} missing required font-size`);
+			rule.eachDecl(/^font(-family)?$/, resolveDeclaration);
+			rule.eachDecl(/^font-(weight|style|variant|stretch)$/, resolveDeclaration);
+			rule.eachDecl('font-size', () => {
+				isSizeProvided = true;
+				if (++fontDeclarationCount === 1) {
+					throw new Error(`${errorPrefix} font-size missing required family`);
 				}
+			});
 
-				filteredPacks = _.reject(filteredPacks, p2 => {
-					var isMatch = true;
-					_.forEach(Object.keys(p2), prop => {
-						if (_.startsWith(prop, 'reverse:')) {
-							return true;
-						}
-						var parts = prop.split(':');
-						prop = parts[0];
-						var packValue = parts[1];
-						var propValue = props[prop];
-						if (_.isUndefined(propValue) && props.font) {
-							propValue = props.font[prop];
-						}
-						if (packValue !== propValue) {
-							isMatch = false;
-							return false;
-						}
+			if (fontDeclarationCount === 0) {
+				return;
+			}
+
+			if (options.requireSize && !isSizeProvided) {
+				throw new Error(`${errorPrefix} missing required font-size`);
+			}
+
+			filteredPacks = _.reject(filteredPacks, p2 => {
+				let isMatch = true;
+				_.forEach(Object.keys(p2), prop => {
+					if (_.startsWith(prop, 'reverse:')) {
 						return true;
-					});
-					return !isMatch;
+					}
+					const [packProp, packValue] = prop.split(':');
+					let propValue = props[packProp];
+					if (_.isUndefined(propValue) && props.font) {
+						propValue = props.font[packProp];
+					}
+					if (packValue !== propValue) {
+						isMatch = false;
+						return false;
+					}
+					return true;
 				});
+				return !isMatch;
+			});
 
-				// ReSharper disable once QualifiedExpressionIsNull
-				if (filteredPacks.length > 1) {
-					throw new Error(`${ERROR_PREFIX} more than one pack found`);
-				}
+			// ReSharper disable once QualifiedExpressionIsNull
+			if (filteredPacks.length > 1) {
+				throw new Error(`${errorPrefix} more than one pack found`);
+			}
 
-				if (filteredPacks.length === 0) {
-					throw new Error(`${ERROR_PREFIX} pack not found`);
-				}
+			if (filteredPacks.length === 0) {
+				throw new Error(`${errorPrefix} pack not found`);
+			}
 
-				// passes validation
-				var pack = filteredPacks[0];
-				var font = props.font;
-				if (font) {
-					rule.eachDecl('font', decl => {
-						var sizeFamily = [
-							font.sizeLineHeight,
-							pack[`family:${font.family}`]
-						];
-						delete font.sizeLineHeight;
-						delete font.family;
-						decl.value = _.union(
-							Object.keys(font).map(prop => {
-								return pack[`${prop}:${font[prop]}`];
-							}),
-							sizeFamily
-						).join(' ');
-					});
-					delete props.font;
-				}
-				Object.keys(props).forEach(prop => {
-					rule.eachDecl(`font-${prop}`, decl => {
-						decl.value = pack[`${prop}:${decl.value}`];
-					});
+			// passes validation
+			const pack = filteredPacks[0];
+			const font = props.font;
+			if (font) {
+				rule.eachDecl('font', decl => {
+					const sizeFamily = [
+						font.sizeLineHeight,
+						pack[`family:${font.family}`]
+					];
+					delete font.sizeLineHeight;
+					delete font.family;
+					decl.value = _.union(
+						Object.keys(font).map(prop => {
+							return pack[`${prop}:${font[prop]}`];
+						}),
+						sizeFamily
+					).join(' ');
+				});
+				delete props.font;
+			}
+			Object.keys(props).forEach(prop => {
+				rule.eachDecl(`font-${prop}`, decl => {
+					decl.value = pack[`${prop}:${decl.value}`];
 				});
 			});
-		};
-	}
-);
+		});
+	};
+});
 
-module PostCssFontPack {
+export module PostCssFontPack {
 	/**
 	 * Plugin options.
 	 */
@@ -231,5 +230,3 @@ module PostCssFontPack {
 		stretch?: string|string[];
 	}
 }
-
-export = PostCssFontPack;

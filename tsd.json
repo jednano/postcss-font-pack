@@ -6,31 +6,19 @@
   "bundle": "typings/tsd.d.ts",
   "installed": {
     "mocha/mocha.d.ts": {
-      "commit": "625cd68fed45e3230393af71bcde1d36706f3d56"
+      "commit": "f6c8ca47193fb67947944a3170912672ac3e908e"
     },
     "sinon-chai/sinon-chai.d.ts": {
-      "commit": "625cd68fed45e3230393af71bcde1d36706f3d56"
-    },
-    "sinon/sinon.d.ts": {
-      "commit": "625cd68fed45e3230393af71bcde1d36706f3d56"
+      "commit": "f6c8ca47193fb67947944a3170912672ac3e908e"
     },
     "chai/chai.d.ts": {
-      "commit": "625cd68fed45e3230393af71bcde1d36706f3d56"
+      "commit": "f6c8ca47193fb67947944a3170912672ac3e908e"
+    },
+    "sinon/sinon.d.ts": {
+      "commit": "f6c8ca47193fb67947944a3170912672ac3e908e"
     },
     "node/node.d.ts": {
-      "commit": "625cd68fed45e3230393af71bcde1d36706f3d56"
-    },
-    "vinyl-fs/vinyl-fs.d.ts": {
-      "commit": "625cd68fed45e3230393af71bcde1d36706f3d56"
-    },
-    "serve-static/serve-static.d.ts": {
-      "commit": "625cd68fed45e3230393af71bcde1d36706f3d56"
-    },
-    "mime/mime.d.ts": {
-      "commit": "625cd68fed45e3230393af71bcde1d36706f3d56"
-    },
-    "vinyl/vinyl.d.ts": {
-      "commit": "625cd68fed45e3230393af71bcde1d36706f3d56"
+      "commit": "f6c8ca47193fb67947944a3170912672ac3e908e"
     }
   }
 }

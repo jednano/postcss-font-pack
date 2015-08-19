@@ -1,53 +1,51 @@
 ﻿///<reference path='../typings/tsd.d.ts'/>
-import chai = require('chai');
-import plugin = require('./plugin');
-var postcss = require('postcss');
+import { expect } from 'chai';
+import postcss from 'postcss';
+import postcssFontPack, { PostCssFontPack } from '../lib/plugin';
 
-var expect = chai.expect;
-
-var PLUGIN_NAME = 'postcss-font-pack';
-var ERROR_PREFIX = `[${PLUGIN_NAME}]`;
+const plugin = 'postcss-font-pack';
+const errorPrefix = `[${plugin}]`;
 
 // ReSharper disable WrongExpressionStatement
 describe('postcss-font-pack plugin', () => {
 
 	it('throws if configuration options are not provided', () => {
-		var fn = () => {
-			check(void(0), '');
-		};
-		expect(fn).to.throw(`${ERROR_PREFIX} missing required configuration`);
+		function fn() {
+			check(void 0, '');
+		}
+		expect(fn).to.throw(`${errorPrefix} missing required configuration`);
 	});
 
 	it('throws if packs option is not provided', () => {
-		var fn = () => {
+		function fn() {
 			check(<any>{}, '');
-		};
-		expect(fn).to.throw(`${ERROR_PREFIX} missing required option: packs`);
+		}
+		expect(fn).to.throw(`${errorPrefix} missing required option: packs`);
 	});
 
 	it('throws if packs option has no keys', () => {
-		var fn = () => {
+		function fn() {
 			check({ packs: {} }, '');
-		};
-		expect(fn).to.throw(`${ERROR_PREFIX} packs option has no keys`);
+		}
+		expect(fn).to.throw(`${errorPrefix} packs option has no keys`);
 	});
 
 	it('throws if a pack family is not specified', () => {
-		var fn = () => {
+		function fn() {
 			check({ packs: { a: <any>{ propGroups: <any>[] } } }, '');
-		};
-		expect(fn).to.throw(`${ERROR_PREFIX} missing required pack.family`);
+		}
+		expect(fn).to.throw(`${errorPrefix} missing required pack.family`);
 	});
 
 	it('throws if a pack family is empty', () => {
-		var fn = () => {
+		function fn() {
 			check({ packs: { a: { family: <any>[] } } }, '');
-		};
-		expect(fn).to.throw(`${ERROR_PREFIX} pack.family is empty`);
+		}
+		expect(fn).to.throw(`${errorPrefix} pack.family is empty`);
 	});
 
 	it('throws if prop value is null', () => {
-		var fn = () => {
+		function fn() {
 			check(
 				{
 					packs: {
@@ -63,12 +61,12 @@ describe('postcss-font-pack plugin', () => {
 				},
 				''
 			);
-		};
-		expect(fn).to.throw(TypeError, `${ERROR_PREFIX} prop value expects string, number or array`);
+		}
+		expect(fn).to.throw(TypeError, `${errorPrefix} prop value expects string, number or array`);
 	});
 
 	it('throws if font declaration is missing a size', () => {
-		var fn = () => {
+		function fn() {
 			check(
 				{
 					packs: {
@@ -79,12 +77,12 @@ describe('postcss-font-pack plugin', () => {
 				},
 				'body{font:roboto}'
 			);
-		};
+		}
 		expect(fn).to.throw(/font property requires size and family/);
 	});
 
 	it('throws if font declaration is missing a family', () => {
-		var fn = () => {
+		function fn() {
 			check(
 				{
 					packs: {
@@ -95,12 +93,12 @@ describe('postcss-font-pack plugin', () => {
 				},
 				'body{font:0}'
 			);
-		};
+		}
 		expect(fn).to.throw(/font property requires size and family/);
 	});
 
 	it('throws if no pack is found for font-family property', () => {
-		var fn = () => {
+		function fn() {
 			check(
 				{
 					packs: {
@@ -111,12 +109,12 @@ describe('postcss-font-pack plugin', () => {
 				},
 				'body{font-family:foo}'
 			);
-		};
+		}
 		expect(fn).to.throw(/pack not found/);
 	});
 
 	it('throws if more than one pack is found', () => {
-		var fn = () => {
+		function fn() {
 			check(
 				{
 					packs: {
@@ -135,12 +133,12 @@ describe('postcss-font-pack plugin', () => {
 				},
 				'body{font:bold 0 roboto}'
 			);
-		};
-		expect(fn).to.throw(`${ERROR_PREFIX} more than one pack found`);
+		}
+		expect(fn).to.throw(`${errorPrefix} more than one pack found`);
 	});
 
 	it('throws if fallbacks are provided', () => {
-		var fn = () => {
+		function fn() {
 			check(
 				{
 					packs: {
@@ -151,7 +149,7 @@ describe('postcss-font-pack plugin', () => {
 				},
 				'body{font:0 roboto, Arial, sans-serif}'
 			);
-		};
+		}
 		expect(fn).to.throw(/pack not found/);
 	});
 
@@ -307,7 +305,7 @@ describe('postcss-font-pack plugin', () => {
 	});
 
 	it('throws if a font pack is not found', () => {
-		var fn = () => {
+		function fn() {
 			check(
 				{
 					packs: {
@@ -323,12 +321,12 @@ describe('postcss-font-pack plugin', () => {
 				},
 				'body{font:oblique 1rem/1.2 roboto}'
 			);
-		};
+		}
 		expect(fn).to.throw(/pack not found/);
 	});
 
 	it('throws if a font pack is only partially matched', () => {
-		var fn = () => {
+		function fn() {
 			check(
 				{
 					packs: {
@@ -345,12 +343,12 @@ describe('postcss-font-pack plugin', () => {
 				},
 				'body{font:italic 1rem/1.2 roboto}'
 			);
-		};
-		expect(fn).to.throw(`${ERROR_PREFIX} pack not found`);
+		}
+		expect(fn).to.throw(`${errorPrefix} pack not found`);
 	});
 
 	it('throws if only a font-size is provided', () => {
-		var fn = () => {
+		function fn() {
 			check(
 				{
 					packs: {
@@ -361,8 +359,8 @@ describe('postcss-font-pack plugin', () => {
 				},
 				'body{font-size:0}'
 			);
-		};
-		expect(fn).to.throw(`${ERROR_PREFIX} font-size missing required family`);
+		}
+		expect(fn).to.throw(`${errorPrefix} font-size missing required family`);
 	});
 
 	it('remains silent for rules without font declarations', () => {
@@ -382,7 +380,7 @@ describe('postcss-font-pack plugin', () => {
 	describe('plugin options', () => {
 		describe('requireSize: true', () => {
 			it('throws if no font-size is specified', () => {
-				var fn = () => {
+				function fn() {
 					check(
 						{
 							requireSize: true,
@@ -394,12 +392,12 @@ describe('postcss-font-pack plugin', () => {
 						},
 						'body{font-family:roboto}'
 					);
-				};
-				expect(fn).to.throw(`${ERROR_PREFIX} missing required font-size`);
+				}
+				expect(fn).to.throw(`${errorPrefix} missing required font-size`);
 			});
 
 			it('remains silent when both size and family are provided', () => {
-				var options: plugin.Options = {
+				const options: PostCssFontPack.Options = {
 					requireSize: true,
 					packs: {
 						roboto: {
@@ -423,7 +421,7 @@ describe('postcss-font-pack plugin', () => {
 	});
 });
 
-function check(options: plugin.Options, input?: string, output?: string) {
-	var processor = postcss([plugin(options)]);
+function check(options: PostCssFontPack.Options, input?: string, output?: string) {
+	const processor = postcss([postcssFontPack(options)]);
 	expect(processor.process(input).css).to.equal(output);
 }

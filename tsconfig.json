@@ -1,0 +1,14 @@
+﻿{
+	"compilerOptions": {
+		"target": "es6",
+		"declaration": true,
+		"newLine": "LF",
+		"outDir": "build",
+		"rootDir": "."
+	},
+	"files": [
+		"lib/plugin.ts",
+		"test/plugin.ts",
+		"typings/postcss/d.ts/postcss.d.ts"
+	]
+}
