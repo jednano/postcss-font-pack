@@ -79,9 +79,9 @@ Also, notice that fallback fonts were added to the `font-family`. This allows yo
 
 You don't have to use the font shorthand property. You can also write-out each declaration individually or you can use the [`postcss-nested-props`](https://github.com/jedmao/postcss-nested-props) plugin to enable a nested syntax. Just make sure you unwrap the nested with that plugin before you run this one.
 
-## Validation
+## Linting
 
-This plugin also handles validation so you can sleep sound knowing that nobody is using fonts or combinations of font declarations that are not supported or otherwise go against the design of the site. The following rules would all throw the same error, "pack not found":
+This plugin also handles linting so you can sleep sound knowing that nobody is using fonts or combinations of font declarations that are not supported or otherwise go against the design of the site. The following rules would all throw the same error, "pack not found":
 
 ```css
 .foo {
@@ -97,9 +97,33 @@ This plugin also handles validation so you can sleep sound knowing that nobody i
 }
 ```
 
-Even though the `light` weight is found in your configuration, there is no font pack that uses `light` without also using `italic` and `condensed`. You have to use all three of them together to form a pack and to pass validation.
+Even though the `light` weight is found in your configuration, there is no font pack that uses `light` without also using `italic` and `condensed`. You have to use all three of them together to form a pack and to pass linting.
 
 As you can see, this plugin will stop unsupported font declarations dead in their tracks.
+
+## Ignoring sections
+
+If you need to ignore a specific declaration, but don't want to ignore the entire stylesheet, you can do so by _preceding the declaration_ with a special comment:
+
+```css
+.foo {
+	/* postcss-font-pack: ignore-next */
+	font: "Comic Sans", cursive;
+}
+```
+
+This will cause the linter to ignore **_only_** the very **_next_** selector.
+
+You can also ignore ranges:
+
+```css
+/* postcss-font-pack: start-ignore */
+.foo {
+	font: "Comic Sans", cursive;
+	font-size: 38px;
+}
+/* postcss-font-pack: end-ignore */
+```
 
 ## Installation
 

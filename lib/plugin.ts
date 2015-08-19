@@ -6,12 +6,12 @@ const plugin = 'postcss-font-pack';
 const errorContext = { plugin };
 const errorPrefix = `[${plugin}]`;
 
+const directivePattern = new RegExp(`^${plugin}: ([a-z-]+)$`);
 const fontValuePattern = /^(?:\s*(.+)\s+)?(\S+(?:\/\S+)?)\s+(.+)\s*$/;
 
 export default postcss.plugin<PostCssFontPack.Options>('postcss-font-pack', options => {
 
-	return node => {
-
+	return root => {
 		if (!options) {
 			throw new Error(`${errorPrefix} missing required configuration`);
 		}
@@ -63,13 +63,103 @@ export default postcss.plugin<PostCssFontPack.Options>('postcss-font-pack', opti
 			});
 		});
 
-		node.eachRule(rule => {
+		let start: {
+			line: number;
+			column: number;
+		} = null;
+		const ignoreRanges: {
+			start: typeof start;
+			end: typeof start;
+		}[] = [];
+		const ignoreNexts: (typeof start)[] = [];
+		root.eachComment(comment => {
+			const m = comment.text.match(directivePattern);
+			const directive = m && m[1];
+			if (!directive) {
+				return;
+			}
+			switch (directive) {
+				case 'start-ignore':
+					if (start !== null) {
+						throw comment.error(
+							'start-ignore already defined',
+							errorContext
+						);
+					}
+					start = comment.source.end;
+					break;
+				case 'end-ignore':
+					if (start === null) {
+						throw comment.error(
+							'start-ignore not defined',
+							errorContext
+						);
+					}
+					ignoreRanges.push({
+						start,
+						end: comment.source.start
+					});
+					start = null;
+					break;
+				case 'ignore-next':
+					if (start !== null) {
+						throw comment.error(
+							'Unnecessary ignore-next after start-ignore',
+							errorContext
+						);
+					}
+					ignoreNexts.push(comment.source.end);
+					break;
+				default:
+					throw comment.error(
+						`Unsupported directive: ${directive}`,
+						errorContext
+					);
+			}
+		});
+
+		function isWithinIgnoreRange(decl: any) {
+			if (
+				ignoreNexts.length &&
+				isSourceAfterOther(decl.source.start, ignoreNexts[0])
+				) {
+				ignoreNexts.shift();
+				return true;
+			}
+
+			for (const range of ignoreRanges) {
+				if (
+					isSourceAfterOther(decl.source.start, range.start) &&
+					isSourceAfterOther(range.end, decl.source.end)
+					) {
+					return true;
+				}
+			}
+
+			return false;
+
+			function isSourceAfterOther(source: typeof start, other: typeof start) {
+				if (source.line < other.line) {
+					return false;
+				}
+				if (source.line > other.line) {
+					return true;
+				}
+				return source.column >= other.column;
+			}
+		}
+
+		root.eachRule(rule => {
 			const props: any = {};
 			let filteredPacks = [];
 			let fontDeclarationCount = 0;
 			let isSizeProvided = false;
 
 			function resolveDeclaration(decl: any) {
+
+				if (isWithinIgnoreRange(decl)) {
+					return;
+				}
 
 				function validatePackFound() {
 					if (!filteredPacks || !filteredPacks.length) {
@@ -128,7 +218,10 @@ export default postcss.plugin<PostCssFontPack.Options>('postcss-font-pack', opti
 
 			rule.eachDecl(/^font(-family)?$/, resolveDeclaration);
 			rule.eachDecl(/^font-(weight|style|variant|stretch)$/, resolveDeclaration);
-			rule.eachDecl('font-size', () => {
+			rule.eachDecl('font-size', decl => {
+				if (isWithinIgnoreRange(decl)) {
+					return;
+				}
 				isSizeProvided = true;
 				if (++fontDeclarationCount === 1) {
 					throw new Error(`${errorPrefix} font-size missing required family`);

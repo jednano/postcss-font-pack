@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "postcss-font-pack", "http://localhost:50079", "{D6A45FBF-C204-4941-820A-E47119CE3FFF}"
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "postcss-font-pack", "http://localhost:50079", "{4BAA8C33-D5F2-423C-A7A0-2BE5C5DC4530}"
 	ProjectSection(WebsiteProperties) = preProject
 		UseIISExpress = "true"
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
@@ -29,8 +29,8 @@ Global
 		Debug|Any CPU = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D6A45FBF-C204-4941-820A-E47119CE3FFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D6A45FBF-C204-4941-820A-E47119CE3FFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BAA8C33-D5F2-423C-A7A0-2BE5C5DC4530}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BAA8C33-D5F2-423C-A7A0-2BE5C5DC4530}.Debug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
