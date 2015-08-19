@@ -4,9 +4,10 @@
      title="Philosopher’s stone, logo of PostCSS"
      src="http://postcss.github.io/postcss/logo-leftp.png">
 
-[![Build Status](https://travis-ci.org/jedmao/postcss-font-pack.svg?branch=master)](https://travis-ci.org/jedmao/postcss-font-pack)
-[![npm version](https://badge.fury.io/js/postcss-font-pack.svg)](http://badge.fury.io/js/postcss-font-pack)
+[![NPM version](http://img.shields.io/npm/v/postcss-font-pack.svg?style=flat)](https://www.npmjs.org/package/postcss-font-pack)
 [![npm license](http://img.shields.io/npm/l/postcss-font-pack.svg?style=flat-square)](https://www.npmjs.org/package/postcss-font-pack)
+[![Travis Build Status](https://img.shields.io/travis/jedmao/postcss-font-pack.svg?label=unix)](https://travis-ci.org/jedmao/postcss-font-pack)
+[![AppVeyor Build Status](https://img.shields.io/appveyor/ci/jedmao/postcss-font-pack.svg?label=windows)](https://ci.appveyor.com/project/jedmao/postcss-font-pack)
 
 [![npm](https://nodei.co/npm/postcss-font-pack.svg?downloads=true)](https://nodei.co/npm/postcss-font-pack/)
 
