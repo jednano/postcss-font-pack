@@ -21,131 +21,44 @@ export default postcss.plugin<PostCssFontPack.Options>('postcss-font-pack', opti
 			throw new Error(`${errorPrefix} missing required option: packs`);
 		}
 
-		const keys = Object.keys(packs);
-		if (!keys.length) {
+		if (!Object.keys(packs).length) {
 			throw new Error(`${errorPrefix} packs option has no keys`);
 		}
 
-		const lookup = {};
-		keys.forEach(key => {
-			const pack = packs[key];
-			if (!pack.family) {
-				throw new Error(`${errorPrefix} missing required pack.family`);
-			}
-			if (!pack.family.length) {
-				throw new Error(`${errorPrefix} pack.family is empty`);
-			}
-			const family = {};
-			family[`family:${key}`] = pack.family.join(', ');
-			if (!pack.propGroups || !pack.propGroups.length) {
-				lookup[key] = [family];
-				return;
-			}
-			lookup[key] = pack.propGroups.map(prop => {
-				const props = {};
-				Object.keys(prop).forEach(p => {
-					const v = prop[p];
-					switch (typeof v) {
-						case 'string':
-						case 'number':
-							props[`${p}:${v}`] = v;
-							props[`reverse:${v}`] = p;
-							break;
-						default:
-							if (!Array.isArray(v)) {
-								throw new TypeError(`${errorPrefix} prop value expects string, number or array`);
-							}
-							props[`${p}:${v[0]}`] = v[1];
-							props[`reverse:${v[0]}`] = p;
-					}
-				});
-				return <any>_.assign({}, family, props);
-			});
-		});
-
-		let start: {
-			line: number;
-			column: number;
-		} = null;
-		const ignoreRanges: {
-			start: typeof start;
-			end: typeof start;
-		}[] = [];
-		const ignoreNexts: (typeof start)[] = [];
-		root.walkComments(comment => {
-			const m = comment.text.match(directivePattern);
-			const directive = m && m[1];
-			if (!directive) {
-				return;
-			}
-			switch (directive) {
-				case 'start-ignore':
-					if (start !== null) {
-						throw comment.error(
-							'start-ignore already defined',
-							errorContext
-						);
-					}
-					start = comment.source.end;
-					break;
-				case 'end-ignore':
-					if (start === null) {
-						throw comment.error(
-							'start-ignore not defined',
-							errorContext
-						);
-					}
-					ignoreRanges.push({
-						start,
-						end: comment.source.start
-					});
-					start = null;
-					break;
-				case 'ignore-next':
-					if (start !== null) {
-						throw comment.error(
-							'Unnecessary ignore-next after start-ignore',
-							errorContext
-						);
-					}
-					ignoreNexts.push(comment.source.end);
-					break;
-				default:
-					throw comment.error(
-						`Unsupported directive: ${directive}`,
-						errorContext
-					);
-			}
-		});
+		const lookup = buildLookupTable(packs);
+		const zonesToIgnore = findZonesToIgnore(root);
 
 		function isWithinIgnoreRange(decl: postcss.Declaration) {
 			if (
-				ignoreNexts.length &&
-				isSourceAfterOther(decl.source.start, ignoreNexts[0])
-				) {
-				ignoreNexts.shift();
+				zonesToIgnore.nexts.length &&
+				isPositionAfterOther(decl.source.start, zonesToIgnore.nexts[0])
+			) {
+				zonesToIgnore.nexts.shift();
 				return true;
 			}
 
-			for (const range of ignoreRanges) {
+			for (const range of zonesToIgnore.ranges) {
 				if (
-					isSourceAfterOther(decl.source.start, range.start) &&
-					isSourceAfterOther(range.end, decl.source.end)
-					) {
+					isPositionAfterOther(decl.source.start, range.start) &&
+					isPositionAfterOther(range.end, decl.source.end)
+				) {
 					return true;
 				}
 			}
 
 			return false;
 
-			function isSourceAfterOther(source: typeof start, other: typeof start) {
-				if (source.line < other.line) {
+			function isPositionAfterOther(
+				position: PostCssFontPack.Position,
+				other: PostCssFontPack.Position
+			) {
+				if (position.line < other.line) {
 					return false;
 				}
-				if (source.line > other.line) {
+				if (position.line > other.line) {
 					return true;
 				}
-				return source.column >= other.column;
+				return position.column >= other.column;
 			}
 		}
 
@@ -307,7 +220,10 @@ export module PostCssFontPack {
 		/**
 		 * Supported font packs.
 		 */
-		packs: {[key: string]: Pack};
+		packs: Packs;
+	}
+	export interface Packs {
+		[slug: string]: Pack;
 	}
 	export interface Pack {
 		family: string[];
@@ -322,4 +238,108 @@ export module PostCssFontPack {
 		variant?: string|string[];
 		stretch?: string|string[];
 	}
+	export interface Range {
+		start: Position;
+		end: Position;
+	}
+	export interface Position {
+		line: number;
+		column: number;
+	}
+	export interface Lookup {
+		[slug: string]: Hash<string>[];
+	}
+	export interface Hash<T> {
+		[key: string]: T;
+	}
+}
+
+function buildLookupTable(packs: PostCssFontPack.Packs) {
+	const lookup: PostCssFontPack.Lookup = {};
+	Object.keys(packs).forEach(slug => {
+		const pack = packs[slug];
+		if (!pack.family) {
+			throw new Error(`${errorPrefix} missing required pack.family`);
+		}
+		if (!pack.family.length) {
+			throw new Error(`${errorPrefix} pack.family is empty`);
+		}
+		const family: PostCssFontPack.Hash<string> = {
+			[`family:${slug}`]: pack.family.join(', ')
+		};
+		if (!pack.propGroups || !pack.propGroups.length) {
+			lookup[slug] = [family];
+			return;
+		}
+		lookup[slug] = pack.propGroups.map(prop => {
+			const props = {};
+			Object.keys(prop).forEach(p => {
+				const v = prop[p];
+				switch (typeof v) {
+					case 'string':
+					case 'number':
+						props[`${p}:${v}`] = v;
+						props[`reverse:${v}`] = p;
+						break;
+					default:
+						if (!Array.isArray(v)) {
+							throw new TypeError(`${errorPrefix} prop value expects string, number or array`);
+						}
+						props[`${p}:${v[0]}`] = v[1];
+						props[`reverse:${v[0]}`] = p;
+				}
+			});
+			return _.assign({}, family, props);
+		});
+	});
+	return lookup;
+}
+
+function findZonesToIgnore(root: postcss.Root) {
+	let start: PostCssFontPack.Position = null;
+	const ranges: PostCssFontPack.Range[] = [];
+	const nexts: PostCssFontPack.Position[] = [];
+	root.walkComments(comment => {
+		const m = comment.text.match(directivePattern);
+		const directive = m && m[1];
+		if (!directive) {
+			return;
+		}
+		switch (directive) {
+			case 'start-ignore':
+				if (start !== null) {
+					throw comment.error(
+						'start-ignore already defined',
+						errorContext
+						);
+				}
+				start = comment.source.end;
+				break;
+			case 'end-ignore':
+				if (start === null) {
+					throw comment.error(
+						'start-ignore not defined',
+						errorContext
+						);
+				}
+				ranges.push({ start, end: comment.source.start });
+				start = null;
+				break;
+			case 'ignore-next':
+				if (start !== null) {
+					throw comment.error(
+						'Unnecessary ignore-next after start-ignore',
+						errorContext
+						);
+				}
+				nexts.push(comment.source.end);
+				break;
+			default:
+				throw comment.error(
+					`Unsupported directive: ${directive}`,
+					errorContext
+				);
+		}
+	});
+	return { ranges, nexts };
 }
