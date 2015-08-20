@@ -1,4 +1,4 @@
-﻿///<reference path="../typings/postcss/.d.ts" />
+﻿///<reference path="../node_modules/postcss/postcss.d.ts" />
 import postcss from 'postcss';
 const _ = require('lodash');
 
@@ -72,7 +72,7 @@ export default postcss.plugin<PostCssFontPack.Options>('postcss-font-pack', opti
 			end: typeof start;
 		}[] = [];
 		const ignoreNexts: (typeof start)[] = [];
-		root.eachComment(comment => {
+		root.walkComments(comment => {
 			const m = comment.text.match(directivePattern);
 			const directive = m && m[1];
 			if (!directive) {
@@ -118,7 +118,7 @@ export default postcss.plugin<PostCssFontPack.Options>('postcss-font-pack', opti
 			}
 		});
 
-		function isWithinIgnoreRange(decl: any) {
+		function isWithinIgnoreRange(decl: postcss.Declaration) {
 			if (
 				ignoreNexts.length &&
 				isSourceAfterOther(decl.source.start, ignoreNexts[0])
@@ -149,13 +149,13 @@ export default postcss.plugin<PostCssFontPack.Options>('postcss-font-pack', opti
 			}
 		}
 
-		root.eachRule(rule => {
+		root.walkRules(rule => {
 			const props: any = {};
 			let filteredPacks = [];
 			let fontDeclarationCount = 0;
 			let isSizeProvided = false;
 
-			function resolveDeclaration(decl: any) {
+			function resolveDeclaration(decl: postcss.Declaration) {
 
 				if (isWithinIgnoreRange(decl)) {
 					return;
@@ -216,9 +216,9 @@ export default postcss.plugin<PostCssFontPack.Options>('postcss-font-pack', opti
 				}
 			}
 
-			rule.eachDecl(/^font(-family)?$/, resolveDeclaration);
-			rule.eachDecl(/^font-(weight|style|variant|stretch)$/, resolveDeclaration);
-			rule.eachDecl('font-size', decl => {
+			rule.walkDecls(/^font(-family)?$/, resolveDeclaration);
+			rule.walkDecls(/^font-(weight|style|variant|stretch)$/, resolveDeclaration);
+			rule.walkDecls('font-size', decl => {
 				if (isWithinIgnoreRange(decl)) {
 					return;
 				}
@@ -269,7 +269,7 @@ export default postcss.plugin<PostCssFontPack.Options>('postcss-font-pack', opti
 			const pack = filteredPacks[0];
 			const font = props.font;
 			if (font) {
-				rule.eachDecl('font', decl => {
+				rule.walkDecls('font', decl => {
 					const sizeFamily = [
 						font.sizeLineHeight,
 						pack[`family:${font.family}`]
@@ -286,7 +286,7 @@ export default postcss.plugin<PostCssFontPack.Options>('postcss-font-pack', opti
 				delete props.font;
 			}
 			Object.keys(props).forEach(prop => {
-				rule.eachDecl(`font-${prop}`, decl => {
+				rule.walkDecls(`font-${prop}`, decl => {
 					decl.value = pack[`${prop}:${decl.value}`];
 				});
 			});

@@ -9,6 +9,6 @@
 	"files": [
 		"lib/plugin.ts",
 		"test/plugin.ts",
-		"typings/postcss/d.ts/postcss.d.ts"
+		"node_modules/postcss/d.ts/postcss.d.ts"
 	]
 }

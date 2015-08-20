@@ -2,10 +2,10 @@
   "name": "postcss-font-pack",
   "version": "0.0.6",
   "description": "PostCSS plugin to simplify font declarations by validating only configured font packs are used and adding fallbacks.",
-  "main": "dist/plugin.js",
+  "main": "dist/lib/plugin.js",
   "scripts": {
     "prepublish": "gulp && gulp copy && npm run babelify",
-    "babelify": "babel build/lib --out-dir dist",
+    "babelify": "babel build/lib --out-dir dist/lib",
     "test": "gulp && npm run cover && npm run check-coverage",
     "mocha": "_mocha --compilers js:babel-core/register -- build/test",
     "cover": "babel-node node_modules/isparta/bin/isparta cover node_modules/mocha/bin/_mocha -- build/test",
@@ -31,7 +31,7 @@
   "homepage": "https://github.com/jedmao/postcss-font-pack#readme",
   "dependencies": {
     "lodash": "^3.10.1",
-    "postcss": "^4.1.16"
+    "postcss": "^5.0.0"
   },
   "devDependencies": {
     "babel": "^5.8.5",
