@@ -5,9 +5,8 @@ const _ = require('lodash');
 const plugin = 'postcss-font-pack';
 const errorContext = { plugin };
 const errorPrefix = `[${plugin}]`;
-
+const sizeLineHeightPattern = /^\S+(?:\/\S+)?$/;
 const directivePattern = new RegExp(`^${plugin}: ([a-z-]+)$`);
-const fontValuePattern = /^(?:\s*(.+)\s+)?(\S+(?:\/\S+)?)\s+(.+)\s*$/;
 
 export default postcss.plugin<PostCssFontPack.Options>('postcss-font-pack', options => {
 
@@ -64,7 +63,7 @@ export default postcss.plugin<PostCssFontPack.Options>('postcss-font-pack', opti
 
 		root.walkRules(rule => {
 			const props: any = {};
-			let filteredPacks = [];
+			let filteredPacks: PostCssFontPack.Hash<string>[] = [];
 			let fontDeclarationCount = 0;
 			let isSizeProvided = false;
 
@@ -81,38 +80,35 @@ export default postcss.plugin<PostCssFontPack.Options>('postcss-font-pack', opti
 				}
 
 				if (decl.prop === 'font') {
-					const parts = decl.value.match(fontValuePattern);
-					if (!parts) {
+					const values = postcss.list.space(decl.value);
+					fontDeclarationCount += values.length;
+					const family = values.pop();
+					const sizeLineHeight = values.pop();
+					props.font = { family, sizeLineHeight, values };
+					if (
+						_.isUndefined(family) ||
+						_.isUndefined(sizeLineHeight) ||
+						!sizeLineHeightPattern.test(sizeLineHeight)
+					) {
 						throw decl.error(
 							'font property requires size and family',
 							errorContext
 						);
 					}
-					fontDeclarationCount += parts.length - 1;
 					isSizeProvided = true;
-					props.font = _.omit(
-						{
-							props: parts[1],
-							sizeLineHeight: parts[2],
-							family: parts[3]
-						},
-						_.isUndefined
-					);
-					filteredPacks = lookup[props.font.family];
+					filteredPacks = lookup[family];
 
-					if (props.font.props) {
-						props.font.props.split(/\s+/).forEach(val => {
-							filteredPacks = _.filter(filteredPacks, o => {
-								const prop = o[`reverse:${val}`];
-								if (_.isUndefined(prop)) {
-									return false;
-								}
-								props.font[prop] = val;
-								return true;
-							});
+					values.forEach(val => {
+						filteredPacks = _.filter(filteredPacks, o => {
+							const prop = o[`reverse:${val}`];
+							if (_.isUndefined(prop)) {
+								return false;
+							}
+							props.font[prop] = val;
+							return true;
 						});
-						delete props.font.props;
-					}
+					});
+					delete props.font.values;
 					validatePackFound();
 				} else {
 					fontDeclarationCount++;
