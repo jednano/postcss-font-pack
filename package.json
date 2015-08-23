@@ -7,9 +7,8 @@
     "prepublish": "gulp && gulp copy && npm run babelify",
     "babelify": "babel build/lib --out-dir dist/lib",
     "test": "gulp && npm run cover && npm run check-coverage",
-    "mocha": "_mocha --compilers js:babel-core/register -- build/test",
-    "cover": "babel-node node_modules/isparta/bin/isparta cover node_modules/mocha/bin/_mocha -- build/test",
-    "check-coverage": "istanbul check-coverage --statements 100 --functions 100 --branches 100 --lines 100",
+    "cover": "isparta cover node_modules/mocha/bin/_mocha -i build/lib/plugin.js",
+    "check-coverage": "istanbul check-coverage",
     "watch": "sh scripts/watch"
   },
   "repository": {
