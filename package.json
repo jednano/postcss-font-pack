@@ -30,7 +30,7 @@
   "homepage": "https://github.com/jedmao/postcss-font-pack#readme",
   "dependencies": {
     "lodash": "^3.10.1",
-    "postcss": "^5.0.0"
+    "postcss": "^5.0.2"
   },
   "devDependencies": {
     "babel": "^5.8.5",
