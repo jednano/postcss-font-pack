@@ -6,8 +6,10 @@
 
 [![NPM version](http://img.shields.io/npm/v/postcss-font-pack.svg?style=flat)](https://www.npmjs.org/package/postcss-font-pack)
 [![npm license](http://img.shields.io/npm/l/postcss-font-pack.svg?style=flat-square)](https://www.npmjs.org/package/postcss-font-pack)
-[![Travis Build Status](https://img.shields.io/travis/jedmao/postcss-font-pack.svg?label=unix)](https://travis-ci.org/jedmao/postcss-font-pack)
-[![AppVeyor Build Status](https://img.shields.io/appveyor/ci/jedmao/postcss-font-pack.svg?label=windows)](https://ci.appveyor.com/project/jedmao/postcss-font-pack)
+[![Travis Build Status](https://img.shields.io/travis/jedmao/postcss-font-pack.svg)](https://travis-ci.org/jedmao/postcss-font-pack)
+[![codecov](https://codecov.io/gh/jedmao/postcss-font-pack/branch/master/graph/badge.svg)](https://codecov.io/gh/jedmao/postcss-font-pack)
+[![Dependency Status](https://gemnasium.com/badges/github.com/jedmao/postcss-font-pack.svg)](https://gemnasium.com/github.com/jedmao/postcss-font-pack)
+[![CircleCI](https://circleci.com/gh/jedmao/postcss-font-pack.svg?style=svg)](https://circleci.com/gh/jedmao/postcss-font-pack)
 
 [![npm](https://nodei.co/npm/postcss-font-pack.svg?downloads=true)](https://nodei.co/npm/postcss-font-pack/)
 
@@ -147,8 +149,7 @@ postcss([
 ### TypeScript
 
 ```ts
-///<reference path="node_modules/postcss-font-pack/.d.ts" />
-import postcssFontPack from 'postcss-font-pack';
+import * as postcssFontPack from 'postcss-font-pack';
 
 postcss([
 	postcssFontPack({
