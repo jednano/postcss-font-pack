@@ -1,5 +1,4 @@
-﻿///<reference path="../node_modules/postcss/postcss.d.ts" />
-import postcss from 'postcss';
+﻿import * as postcss from 'postcss';
 const _ = require('lodash');
 
 const plugin = 'postcss-font-pack';
@@ -8,7 +7,7 @@ const errorPrefix = `[${plugin}]`;
 const sizeLineHeightPattern = /^\S+(?:\/\S+)?$/;
 const directivePattern = new RegExp(`^${plugin}: ([a-z-]+)$`);
 
-export default postcss.plugin<PostCssFontPack.Options>('postcss-font-pack', options => {
+const PostCssFontPack = postcss.plugin<PostCssFontPack.Options>('postcss-font-pack', options => {
 
 	return root => {
 		if (!options) {
@@ -99,7 +98,7 @@ export default postcss.plugin<PostCssFontPack.Options>('postcss-font-pack', opti
 					filteredPacks = lookup[family];
 
 					values.forEach(val => {
-						filteredPacks = _.filter(filteredPacks, o => {
+						filteredPacks = _.filter(filteredPacks, (o: any) => {
 							const prop = o[`reverse:${val}`];
 							if (_.isUndefined(prop)) {
 								return false;
@@ -116,7 +115,7 @@ export default postcss.plugin<PostCssFontPack.Options>('postcss-font-pack', opti
 					if (prop === 'family') {
 						filteredPacks = lookup[decl.value];
 					} else {
-						filteredPacks = _.filter(filteredPacks, o => {
+						filteredPacks = _.filter(filteredPacks, (o: any) => {
 							return o.hasOwnProperty(`${prop}:${decl.value}`);
 						});
 					}
@@ -145,9 +144,9 @@ export default postcss.plugin<PostCssFontPack.Options>('postcss-font-pack', opti
 				throw new Error(`${errorPrefix} missing required font-size`);
 			}
 
-			filteredPacks = _.reject(filteredPacks, p2 => {
+			filteredPacks = _.reject(filteredPacks, (p2: any) => {
 				let isMatch = true;
-				_.forEach(Object.keys(p2), prop => {
+				_.forEach(Object.keys(p2), (prop: any) => {
 					if (_.startsWith(prop, 'reverse:')) {
 						return true;
 					}
@@ -165,7 +164,6 @@ export default postcss.plugin<PostCssFontPack.Options>('postcss-font-pack', opti
 				return !isMatch;
 			});
 
-			// ReSharper disable once QualifiedExpressionIsNull
 			if (filteredPacks.length > 1) {
 				throw new Error(`${errorPrefix} more than one pack found`);
 			}
@@ -203,7 +201,7 @@ export default postcss.plugin<PostCssFontPack.Options>('postcss-font-pack', opti
 	};
 });
 
-export module PostCssFontPack {
+namespace PostCssFontPack {
 	/**
 	 * Plugin options.
 	 */
@@ -229,6 +227,7 @@ export module PostCssFontPack {
 	 * A collection of supported properties for the associated font family.
 	 */
 	export interface PropGroup {
+		[index: string]: any;
 		weight?: string|number|(string|number)[];
 		style?: string|string[];
 		variant?: string|string[];
@@ -268,7 +267,7 @@ function buildLookupTable(packs: PostCssFontPack.Packs) {
 			return;
 		}
 		lookup[slug] = pack.propGroups.map(prop => {
-			const props = {};
+			const props: { [key: string]: string; } = {};
 			Object.keys(prop).forEach(p => {
 				const v = prop[p];
 				switch (typeof v) {
@@ -339,3 +338,5 @@ function findZonesToIgnore(root: postcss.Root) {
 	});
 	return { ranges, nexts };
 }
+
+export = PostCssFontPack;

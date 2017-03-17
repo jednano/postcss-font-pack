@@ -2,14 +2,45 @@
   "name": "postcss-font-pack",
   "version": "1.0.0",
   "description": "PostCSS plugin to simplify font declarations by validating only configured font packs are used and adding fallbacks.",
-  "main": "dist/lib/plugin.js",
+  "main": "dist/plugin.js",
+  "types": "dist/plugin.d.ts",
   "scripts": {
-    "prepublish": "gulp && gulp copy && npm run babelify",
-    "babelify": "babel build/lib --out-dir dist/lib",
-    "test": "gulp && npm run cover && npm run check-coverage",
-    "cover": "isparta cover node_modules/mocha/bin/_mocha -i build/lib/plugin.js",
-    "check-coverage": "istanbul check-coverage",
-    "watch": "sh scripts/watch"
+    "clean": "rimraf coverage dist *.log",
+    "codecov": "codecov -f coverage/lcov.info",
+    "compile": "tsc",
+    "compile:watch": "tsc --watch",
+    "prepublish": "npm test",
+    "pretest": "npm run tslint && npm run clean && npm run compile",
+    "test": "nyc ava",
+    "test:watch": "ava --watch",
+    "tslint": "tslint --project tsconfig.json"
+  },
+  "ava": {
+    "files": [
+      "dist/**/*.spec.js"
+    ],
+    "source": [
+      "dist/**/*.js"
+    ]
+  },
+  "nyc": {
+    "lines": 100,
+    "statements": 100,
+    "functions": 100,
+    "branches": 100,
+    "include": [
+      "dist/**/*.js"
+    ],
+    "exclude": [
+      "dist/**/*.spec.js"
+    ],
+    "reporter": [
+      "lcov",
+      "text"
+    ],
+    "cache": true,
+    "all": true,
+    "check-coverage": true
   },
   "repository": {
     "type": "git",
@@ -29,25 +60,15 @@
   },
   "homepage": "https://github.com/jedmao/postcss-font-pack#readme",
   "dependencies": {
-    "lodash": "^3.10.1",
-    "postcss": "^5.0.2"
+    "lodash": "^4.17.4",
+    "postcss": "^5.2.16"
   },
   "devDependencies": {
-    "babel": "^5.8.5",
-    "babel-core": "5.8.21",
-    "babel-eslint": "^4.0.5",
-    "chai": "^3.2.0",
-    "del": "^1.2.0",
-    "eslint": "^1.0.0",
-    "event-stream": "^3.3.1",
-    "gulp": "^3.9.0",
-    "gulp-eslint": "^1.0.0",
-    "gulp-filter": "^3.0.0",
-    "gulp-plumber": "^1.0.1",
-    "gulp-tslint": "^3.1.2",
-    "gulp-typescript": "^2.8.0",
-    "isparta": "^3.0.3",
-    "istanbul": "^0.3.17",
-    "mocha": "^2.2.5"
+    "@types/node": "^7.0.8",
+    "ava": "^0.18.2",
+    "nyc": "^10.1.2",
+    "rimraf": "^2.6.1",
+    "tslint": "^4.5.1",
+    "typescript": "^2.2.1"
   }
 }
