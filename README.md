@@ -9,7 +9,6 @@
 [![Travis Build Status](https://img.shields.io/travis/jedmao/postcss-font-pack.svg)](https://travis-ci.org/jedmao/postcss-font-pack)
 [![codecov](https://codecov.io/gh/jedmao/postcss-font-pack/branch/master/graph/badge.svg)](https://codecov.io/gh/jedmao/postcss-font-pack)
 [![Dependency Status](https://gemnasium.com/badges/github.com/jedmao/postcss-font-pack.svg)](https://gemnasium.com/github.com/jedmao/postcss-font-pack)
-[![CircleCI](https://circleci.com/gh/jedmao/postcss-font-pack.svg?style=svg)](https://circleci.com/gh/jedmao/postcss-font-pack)
 
 [![npm](https://nodei.co/npm/postcss-font-pack.svg?downloads=true)](https://nodei.co/npm/postcss-font-pack/)
 
