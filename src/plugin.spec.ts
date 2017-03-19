@@ -5,14 +5,13 @@ import * as plugin from './plugin';
 
 test('throws if configuration options are not provided', macro,
 	'',
-	/missing required configuration/,
-	undefined
+	/missing required configuration/
 );
 
 test('throws if packs option is not provided', macro,
 	'',
 	/missing required option: packs/,
-	<any>{}
+	{}
 );
 
 test('throws if packs option has no keys', macro,
@@ -24,13 +23,13 @@ test('throws if packs option has no keys', macro,
 test('throws if a pack family is not specified', macro,
 	'',
 	/missing required pack.family/,
-	{ packs: { a: <any>{ propGroups: <any>[] } } }
+	{ packs: { a: { propGroups: [] } } }
 );
 
 test('throws if a pack family is empty', macro,
 	'',
 	/pack\.family is empty/,
-	{ packs: { a: { family: <any>[] } } }
+	{ packs: { a: { family: [] } } }
 );
 
 test('throws if prop value is null', macro,
@@ -242,10 +241,7 @@ test('resolves an empty pack', macro,
 			roboto: {
 				family: ['Roboto', 'Arial', 'sans-serif'],
 				propGroups: [
-					{},
-					{
-						style: 'italic'
-					}
+					{}
 				]
 			}
 		}
