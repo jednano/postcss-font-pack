@@ -1,3 +1,4 @@
+,
 {
   "name": "postcss-font-pack",
   "version": "1.0.0",
@@ -13,7 +14,8 @@
     "pretest": "npm run tslint && npm run clean && npm run compile",
     "test": "nyc ava",
     "test:watch": "ava --watch",
-    "tslint": "tslint --project tsconfig.json"
+    "tslint": "tslint --project tsconfig.json",
+    "watch": "npm run test:watch"
   },
   "ava": {
     "files": [
