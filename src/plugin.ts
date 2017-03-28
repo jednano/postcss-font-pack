@@ -25,6 +25,11 @@ const PostCssFontPack = postcss.plugin<PostCssFontPack.Options>('postcss-font-pa
 
 		const lookup = buildLookupTable(packs);
 		const zonesToIgnore = findZonesToIgnore(root);
+		const ignores = options.ignoreDeclarations;
+
+		function isIgnored(decl: postcss.Declaration) {
+			return _.some(options.ignoreDeclarations, { [decl.prop]: decl.value });
+		}
 
 		function isWithinIgnoreRange(decl: postcss.Declaration) {
 			if (
@@ -68,7 +73,7 @@ const PostCssFontPack = postcss.plugin<PostCssFontPack.Options>('postcss-font-pa
 
 			function resolveDeclaration(decl: postcss.Declaration) {
 
-				if (isWithinIgnoreRange(decl)) {
+				if (isIgnored(decl) || isWithinIgnoreRange(decl)) {
 					return;
 				}
 
@@ -206,6 +211,10 @@ namespace PostCssFontPack {
 	 * Plugin options.
 	 */
 	export interface Options {
+		/**
+		 * Declarations to ignore, like CSS hacks (e.g., [{font: '0/0 serif'}]).
+		 */
+		ignoreDeclarations?: { [prop: string]: string; };
 		/**
 		 * When true, an error will be thrown if you have a rule with one or more
 		 * font declarations, but without a font size.

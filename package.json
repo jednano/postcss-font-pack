@@ -1,6 +1,6 @@
 {
   "name": "postcss-font-pack",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "PostCSS plugin to simplify font declarations by validating only configured font packs are used and adding fallbacks.",
   "main": "dist/plugin.js",
   "types": "dist/plugin.d.ts",
