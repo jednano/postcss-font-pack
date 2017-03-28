@@ -116,6 +116,21 @@ test('throws if fallbacks are provided', macro,
 	}
 );
 
+test('ignores a font declaration', macro,
+	'body{font:0/0 serif}',
+	'body{font:0/0 serif}',
+	{
+		ignoreDeclarations: [
+			{ font: '0/0 serif' }
+		],
+		packs: {
+			roboto: {
+				family: ['Roboto', 'Arial', 'sans-serif']
+			}
+		}
+	}
+);
+
 test('resolves a font-family declaration', macro,
 	'body{font-family:roboto}',
 	'body{font-family:Roboto, Arial, sans-serif}',
