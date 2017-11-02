@@ -1,4 +1,4 @@
-﻿import test, { ContextualTestContext } from 'ava';
+﻿import test, { TestContext } from 'ava';
 import * as postcss from 'postcss';
 
 import * as plugin from './plugin';
@@ -481,7 +481,7 @@ test('does not ignore the 2nd font declaration after ignore-next', macro,
 );
 
 function macro(
-	t: ContextualTestContext,
+	t: TestContext,
 	input: string,
 	expectedOutput?: string | RegExp,
 	options?: plugin.Options
