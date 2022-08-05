@@ -165,7 +165,7 @@ Type: `{ [prop: string]: string; }`
 Required: `false`
 Default: `undefined`
 
-A collection of declarations that you would like to ignore. These could be CSS hacks or something else that you really don't want throwing validation errors. Example below:
+A collection of declarations that you would like to ignore. These could be [CSS hacks](https://www.scaler.com/topics/css/css-tricks/) or something else that you really don't want throwing validation errors. Example below:
 
 ```js
 {
